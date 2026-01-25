@@ -1,43 +1,65 @@
 import { useState } from "react";
-import { Topbar } from "./Topbar";
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const credentials = { email, password };
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate("/posts");
+      } else if (response.status === 401) {
+        setErrorMsg(data.message);
+      }
+    } catch (e) {
+      console.log("Error sending details");
+    }
+  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      <Topbar />
+    <div className="flex flex-col min-h-[90dvh] bg-slate-50">
       <div className="flex-1 flex flex-col justify-center items-center p-6">
         <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Login
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-900">Login</h2>
           </div>
 
-          <form action="POST" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-            </div>
-            <div className="space-y-1.5">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4"></div>
+            <div className="space-y-1.5 relative">
               <label className="text-xs font-semibold text-slate-700 ml-1">
-                Email
+                Email<span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
                 name="email"
                 className="w-full h-10 px-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
                 placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
+              {errorMsg && <span className="text-red-500 text-sm absolute left-2 -bottom-4 transition-all">{errorMsg}</span>}
             </div>
 
             <div className="space-y-1.5 relative">
               <label className="text-xs font-semibold text-slate-700 ml-1">
-                Password
+                Password<span className="text-red-500">*</span>
               </label>
               <input
                 type={showPassword ? "text" : "password"}
@@ -46,6 +68,7 @@ export const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full h-10 px-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
                 placeholder="••••••••"
+                required
               />
               {!showPassword ? (
                 <Eye
@@ -70,10 +93,10 @@ export const Login = () => {
             <p className="text-center text-xs text-slate-500 mt-4">
               Don't have an account?{" "}
               <a
-                href="/sign-up"
-                className="text-blue-600 font-semibold hover:underline"
+                onClick={() => navigate("/sign-up")}
+                className="text-blue-600 font-semibold hover:cursor-pointer"
               >
-                Sign Up 
+                Sign Up
               </a>
             </p>
           </form>

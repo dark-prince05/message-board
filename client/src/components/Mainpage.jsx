@@ -1,9 +1,6 @@
-import { Topbar } from "./Topbar";
-
 export const Mainpage = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <Topbar />
+    <div className="flex flex-col min-h-[90dvh]">
       <main className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50">
         <div className="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
           <div className="mb-6">
