@@ -4,7 +4,8 @@ const cors = require("cors");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 const pgPool = require('./db/pool') 
-const router = require("./routers/router");
+const loginRouter = require("./routers/loginRouter");
+const msgRouter = require("./routers/msgRouter");
 
 const app = express();
 app.use(express.json());
@@ -26,7 +27,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1 * 4 * 60 * 60 * 1000,
+      maxAge: 1 * 8 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: 'lax',
       secure: false
@@ -34,7 +35,8 @@ app.use(
   }),
 );
 
-app.use("/", router);
+app.use("/", loginRouter);
+app.use("/message", msgRouter);
 
 app.listen(8000, (err) => {
   if (err) {

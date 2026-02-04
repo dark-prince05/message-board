@@ -46,7 +46,7 @@ export const Login = () => {
                 Email<span className="text-red-500">*</span>
               </label>
               <input
-                type="email"
+                type="text"
                 name="email"
                 className="w-full h-10 px-3 rounded-lg border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm"
                 placeholder="john@example.com"
