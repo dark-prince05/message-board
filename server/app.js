@@ -6,6 +6,7 @@ const pgSession = require("connect-pg-simple")(session);
 const pgPool = require('./db/pool') 
 const loginRouter = require("./routers/loginRouter");
 const msgRouter = require("./routers/msgRouter");
+const logoutRouter = require("./routers/logoutRouter")
 
 const app = express();
 app.use(express.json());
@@ -37,6 +38,7 @@ app.use(
 
 app.use("/", loginRouter);
 app.use("/message", msgRouter);
+app.use("/logout", logoutRouter);
 
 app.listen(8000, (err) => {
   if (err) {

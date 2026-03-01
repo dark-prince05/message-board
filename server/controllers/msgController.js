@@ -3,7 +3,13 @@ const db = require("../db/queries");
 const createMessage = async (req, res) => {
   const { msgTitle, message } = req.body;
   try {
-    await db.createMsg(56, msgTitle, message);
+    const userId = req.session.userId;
+    if (userId == undefined)
+      return res
+        .status(401)
+        .json({ message: "You are not authorized to create message" });
+
+    await db.createMsg(userId, msgTitle, message);
 
     return res.status(201).json({
       message: "Message created successfully",

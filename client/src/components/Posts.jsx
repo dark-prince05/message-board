@@ -1,9 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { Clock, Pencil, Trash2 } from "lucide-react";
 
-export const Posts = () => {
-  const [allMessages, setAllMessages] = useState([]);
-  const [userDetails, setUserDetails] = useState({});
+export const Posts = ({
+  userDetails,
+  whoAmI,
+  fetchMessages,
+  allMessages,
+  setAllMessages,
+}) => {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [messageId, setMessageId] = useState("");
@@ -11,42 +15,8 @@ export const Posts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dialogRef = useRef(null);
 
-  const fetchMessages = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/message/all", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        console.log("Failed to fetch messages");
-      }
-
-      const messages = await response.json();
-      setAllMessages(messages.msgs);
-    } catch (e) {
-      console.log(e, "Error retreiving messages");
-    }
-  };
-
   useEffect(() => {
     fetchMessages();
-  }, []);
-
-  useEffect(() => {
-    const whoAmI = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/me", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        const details = await res.json();
-        setUserDetails(details);
-      } catch (e) {
-        console.log(e.message);
-      }
-    };
     whoAmI();
   }, []);
 
@@ -80,22 +50,21 @@ export const Posts = () => {
   };
 
   const handleDelete = async (msgId) => {
-    const confirmed = confirm("do you really want to delete this message")
-    if(!confirmed) return;
+    const confirmed = confirm("do you really want to delete this message");
+    if (!confirmed) return;
     try {
-      const res = await fetch(`http://localhost:8000/message/delete/${msgId}`,{
+      const res = await fetch(`http://localhost:8000/message/delete/${msgId}`, {
         method: "DELETE",
-        credentials: "include"
-      })
-      if(res.status === 204){
-        alert("Message deleted successfully")
+        credentials: "include",
+      });
+      if (res.status === 204) {
+        alert("Message deleted successfully");
         setAllMessages((prev) => {
-          return prev.filter((msg) => msg.msg_id !== msgId)
-        })
+          return prev.filter((msg) => msg.msg_id !== msgId);
+        });
       } else {
-        alert("Message deleted successfully")
+        alert("Message deleted successfully");
       }
-
     } catch (e) {
       console.log("Error deleting message");
     }
@@ -215,10 +184,14 @@ export const Posts = () => {
                                   ? details.first_name + " " + details.last_name
                                   : "Anonymous"}
                               </h3>
-                              <p className="text-xs text-slate-500 flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {formatTimeAndData(details.created_at)}
-                              </p>
+
+                              {userDetails.role == "admin" ||
+                                (userDetails.role == "member" && (
+                                  <p className="text-xs text-slate-500 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {formatTimeAndData(details.created_at)}
+                                  </p>
+                                ))}
                             </div>
                             <div>
                               <div className="flex gap-2 justify-end mb-1">
@@ -234,7 +207,10 @@ export const Posts = () => {
                                   />
                                 )}
                                 {userDetails.userId === details.user_id && (
-                                  <Trash2 onClick={() => handleDelete(details.msg_id)} className="hover:text-blue-600 hover:cursor-pointer" />
+                                  <Trash2
+                                    onClick={() => handleDelete(details.msg_id)}
+                                    className="hover:text-blue-600 hover:cursor-pointer"
+                                  />
                                 )}
                               </div>
                               <span
