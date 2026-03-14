@@ -17,6 +17,8 @@ const allowedOrigins = [
   "https://darkprince-msg-board.netlify.app"
 ]
 
+app.set("trust proxy", 1) 
+
 app.use(
   cors({
     origin: (origin, callback) => {
