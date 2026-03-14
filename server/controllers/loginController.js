@@ -1,4 +1,3 @@
-const { authenticate } = require("passport");
 const db = require("../db/queries");
 const bcryptjs = require("bcryptjs");
 
@@ -6,7 +5,14 @@ const signup = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   try {
     const hashedPassword = await bcryptjs.hash(password, 10);
-    await db.createUser(firstName, lastName, email, hashedPassword);
+    const user = await db.createUser(firstName, lastName, email, hashedPassword);
+
+    req.session.userId = user[0].user_id;
+    req.session.role = user[0].is_admin
+      ? "admin"
+      : user[0].is_member
+        ? "member"
+        : "guest";
 
     return res.status(201).json({
       message: "User created successfully",
@@ -31,7 +37,7 @@ const login = async (req, res) => {
       email += '@gmail.com'
     }
     const resp = await db.getUser(email);
-    if (!resp) {
+    if (!resp || resp.length === 0) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
     const user = resp[0];

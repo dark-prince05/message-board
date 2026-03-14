@@ -14,6 +14,7 @@ export const Posts = ({
   const [infoMsg, setInfoMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const dialogRef = useRef(null);
+  console.log(userDetails, allMessages)
 
   useEffect(() => {
     fetchMessages();
@@ -26,7 +27,7 @@ export const Posts = ({
     setIsLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8000/message/update/${messageId}`,
+        `${import.meta.env.VITE_API_URL}/message/update/${messageId}`,
         {
           headers: { "Content-Type": "application/json" },
           method: "PATCH",
@@ -53,7 +54,7 @@ export const Posts = ({
     const confirmed = confirm("do you really want to delete this message");
     if (!confirmed) return;
     try {
-      const res = await fetch(`http://localhost:8000/message/delete/${msgId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/message/delete/${msgId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -122,13 +123,15 @@ export const Posts = ({
     return colors[index];
   };
 
-  const formatTimeAndData = (datetime) => {
+  const formatTimeAndDate = (datetime) => {
+    console.log(datetime,'iiiiiiiiiii')
     const result = new Date(datetime).toLocaleString("en-IN", {
       day: "2-digit",
       month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: 'Asia/Kolkata'
     });
     return result;
   };
@@ -179,23 +182,24 @@ export const Posts = ({
                           <div className="flex items-center justify-between gap-3">
                             <div>
                               <h3 className="font-bold text-lg text-slate-800 truncate">
-                                {userDetails.role == "admin" ||
-                                userDetails.role == "member"
+                                {(userDetails.role == "admin" ||
+                                userDetails.role == "member")
                                   ? details.first_name + " " + details.last_name
                                   : "Anonymous"}
                               </h3>
 
-                              {userDetails.role == "admin" ||
-                                (userDetails.role == "member" && (
+                              {(userDetails.role == "admin" ||
+                                userDetails.role == "member") && (
                                   <p className="text-xs text-slate-500 flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
-                                    {formatTimeAndData(details.created_at)}
+                                      {console.log(details)}
+                                    {formatTimeAndDate(details.created_at)}
                                   </p>
-                                ))}
+                                )}
                             </div>
                             <div>
                               <div className="flex gap-2 justify-end mb-1">
-                                {userDetails.userId === details.user_id && (
+                                {(userDetails.role == "admin" || userDetails.userId === details.user_id) && (
                                   <Pencil
                                     className="hover:text-blue-600 hover:cursor-pointer"
                                     onClick={() => {
@@ -206,7 +210,7 @@ export const Posts = ({
                                     }}
                                   />
                                 )}
-                                {userDetails.userId === details.user_id && (
+                                {(userDetails.role == "admin" || userDetails.userId === details.user_id) && (
                                   <Trash2
                                     onClick={() => handleDelete(details.msg_id)}
                                     className="hover:text-blue-600 hover:cursor-pointer"

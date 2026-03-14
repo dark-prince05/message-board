@@ -33,7 +33,7 @@ export const Mainpage = () => {
         </div>
       </main>
       <footer className="py-6 text-center text-slate-500 text-xs">
-        &copy; 2024 Message Board. Simple. Clean. Solid.
+        &copy; 2026 Message Board. Simple. Clean. Solid.
       </footer>
     </div>
   );

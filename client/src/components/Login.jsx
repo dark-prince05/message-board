@@ -13,7 +13,7 @@ export const Login = () => {
     e.preventDefault();
     try {
       const credentials = { email, password };
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -23,11 +23,12 @@ export const Login = () => {
 
       if (response.ok) {
         navigate("/posts");
-      } else if (response.status === 401) {
+      } else {
         setErrorMsg(data.message);
       }
     } catch (e) {
       console.log("Error sending details");
+      setErrorMsg(e);
     }
   };
 
@@ -72,13 +73,13 @@ export const Login = () => {
               />
               {!showPassword ? (
                 <Eye
-                  className="absolute top-1/2 right-3"
+                  className="absolute top-1/2 right-3 cursor-pointer"
                   size={20}
                   onClick={() => setShowPassword((prev) => !prev)}
                 />
               ) : (
                 <EyeOff
-                  className="absolute top-1/2 right-3"
+                  className="absolute top-1/2 right-3 cursor-pointer"
                   size={20}
                   onClick={() => setShowPassword((prev) => !prev)}
                 />

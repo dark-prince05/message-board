@@ -9,10 +9,10 @@ const createUser = async (
   isAdmin = false,
 ) => {
   const res = await pool.query(
-    "INSERT INTO user_details(first_name, last_name, email, password, is_member, is_admin) values ($1, $2, $3, $4, $5, $6)",
+    "INSERT INTO user_details(first_name, last_name, email, password, is_member, is_admin) values ($1, $2, $3, $4, $5, $6) RETURNING *",
     [firstName, lastName, email, password, isMember, isAdmin],
   );
-  return res.rowCount;
+  return res.rows;
 };
 
 const getUser = async (email) => {
@@ -53,4 +53,9 @@ const deleteMsg = async (msgId) => {
   return res.rowCount;
 };
 
-module.exports = { createUser, getUser, createMsg, getAllMessages, updateMsg, deleteMsg };
+const updateRole = async (userId) => {
+  const res = await pool.query("UPDATE user_details SET is_member = true WHERE user_id = $1", [userId])
+  return res.rowCount;
+} 
+
+module.exports = { createUser, getUser, createMsg, getAllMessages, updateMsg, deleteMsg, updateRole };

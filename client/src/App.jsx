@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { Mainpage } from "./components/Mainpage";
 import { Signup } from "./components/Signup";
 import { Login } from "./components/Login";
 import { Topbar } from "./components/Topbar";
 import { Posts } from "./components/Posts";
+import { Membership } from "./components/Membership";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userDetails, setUserDetails] = useState({});
   const [allMessages, setAllMessages] = useState([]);
+  const navigate = useNavigate();
 
   const whoAmI = async () => {
-    const res = await fetch(`http://localhost:8000/me`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/me`, {
       method: "GET",
       credentials: "include",
     });
@@ -21,6 +23,7 @@ function App() {
     if (details?.authenticated === true) {
       setUserDetails(details);
       setIsLoggedIn(true);
+      navigate('/posts')
     } else {
       setUserDetails({});
       setIsLoggedIn(false);
@@ -29,7 +32,7 @@ function App() {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch("http://localhost:8000/message/all", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/message/all`, {
         method: "GET",
         credentials: "include",
       });
@@ -59,7 +62,7 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<Mainpage />} />
-        <Route path="/sign-up" element={<Signup />} />
+        <Route path="/sign-up" element={<Signup whoAmI={whoAmI} />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/posts"
@@ -73,6 +76,7 @@ function App() {
             />
           }
         />
+        <Route path="/membership" element={<Membership />} />
       </Routes>
     </>
   );

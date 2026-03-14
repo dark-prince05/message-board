@@ -6,7 +6,8 @@ const pgSession = require("connect-pg-simple")(session);
 const pgPool = require('./db/pool') 
 const loginRouter = require("./routers/loginRouter");
 const msgRouter = require("./routers/msgRouter");
-const logoutRouter = require("./routers/logoutRouter")
+const logoutRouter = require("./routers/logoutRouter");
+const membershipRouter = require("./routers/membershipRouter");
 
 const app = express();
 app.use(express.json());
@@ -28,10 +29,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1 * 8 * 60 * 60 * 1000,
+      maxAge: 3 * 24 * 60 * 60 * 1000,
       httpOnly: true,
-      sameSite: 'lax',
-      secure: false
+      sameSite: process.env.NODE_ENV === "development" ? 'lax' : 'none',
+      secure: process.env.NODE_ENV !== "development",
     },
   }),
 );
@@ -39,6 +40,7 @@ app.use(
 app.use("/", loginRouter);
 app.use("/message", msgRouter);
 app.use("/logout", logoutRouter);
+app.use("/membership", membershipRouter);
 
 app.listen(8000, (err) => {
   if (err) {

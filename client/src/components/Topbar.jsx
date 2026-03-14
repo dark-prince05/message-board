@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Topbar = ({ isLoggedIn, whoAmI, fetchMessages }) => {
   const [title, setTitle] = useState("");
@@ -6,6 +7,7 @@ export const Topbar = ({ isLoggedIn, whoAmI, fetchMessages }) => {
   const [infoMsg, setInfoMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const dialogRef = useRef(null);
+  const navigate = useNavigate()
 
   const handleOpen = () => {
     document.body.style.overflow = "hidden";
@@ -36,7 +38,7 @@ export const Topbar = ({ isLoggedIn, whoAmI, fetchMessages }) => {
     setIsLoading(true);
     const payload = { msgTitle: title, message };
     try {
-      const res = await fetch("http://localhost:8000/message/create", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/message/create`, {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
@@ -52,16 +54,19 @@ export const Topbar = ({ isLoggedIn, whoAmI, fetchMessages }) => {
       }
     } catch (e) {
       console.log("Error creating message");
+    } finally {
+      setIsLoading(false)
     }
   };
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:8000/logout", {
+      await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
         method: "POST",
         credentials: "include",
       });
-      whoAmI();
+      whoAmI()
+      navigate('/')
     } catch (err) {
       console.log("Error in logout", err);
     }
@@ -95,7 +100,7 @@ export const Topbar = ({ isLoggedIn, whoAmI, fetchMessages }) => {
             </a>
           )}
           {isLoggedIn ? (
-            <div className="text-blue-600 hover:text-blue-700 font-semibold transition-colors cursor-pointer">
+            <div className="text-blue-600 hover:text-blue-700 font-semibold transition-colors cursor-pointer" onClick={() => navigate('/membership')}>
               Membership
             </div>
           ) : (

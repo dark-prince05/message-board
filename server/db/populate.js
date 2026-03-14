@@ -1,5 +1,5 @@
-require("dotenv").config();
-const { Client } = require('pg');
+const { Client } = require("pg");
+const res = require('dotenv').config()
 
 const SQL = `
 CREATE TABLE IF NOT EXISTS user_details(
@@ -17,23 +17,30 @@ CREATE TABLE IF NOT EXISTS user_msgs(
   msg_title TEXT,
   message TEXT,
   user_id INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMPTZ DEFAULT NOW(), 
   CONSTRAINT fk_user
     FOREIGN KEY (user_id) 
     REFERENCES user_details(user_id)
 )
-`
+`;
 const initialize = async () => {
   const client = new Client({
-   connectionString: process.env.DB_CONNECTION_STRING,
-  })
-  console.log("seeding......")
+    connectionString: process.env.DB_CONNECTION_STRING,
+    ssl: { rejectUnauthorized: false },
+  });
+  try {
+    await client.connect();
+    console.log("Connected to database");
 
-  await client.connect();
-  await client.query(SQL);
-  await client.end();
-  console.log("end..........")
-}
+    await client.query(SQL);
+    console.log("Seeding successful");
+  } catch (error) {
+    console.error("Seeding failed:", error.message);
+    process.exit(1);
+  } finally {
+    await client.end();
+    console.log("Database connection closed");
+  }
+};
 
 initialize();
-

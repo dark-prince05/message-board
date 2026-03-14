@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
-export const Signup = () => {
+export const Signup = ({ whoAmI }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -18,7 +18,7 @@ export const Signup = () => {
     e.preventDefault();
     const details = { firstName, lastName, email, password, confirmPassword, isMember: true };
     try {
-      const response = await fetch("http://localhost:8000/sign-up", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/sign-up`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(details),
@@ -28,10 +28,12 @@ export const Signup = () => {
       const data = await response.json();
       if(response.ok) {
         console.log('data sent successfully')
-        navigate('/login');
+        navigate('/posts');
       } else if (response.status === 409){
         setEmailExistError(data.message)
       } else if (response.status === 422){
+        setPasswordError(data.message)
+      } else {
         setPasswordError(data.message)
       }
     } catch (e) {
@@ -120,13 +122,13 @@ export const Signup = () => {
               />
               {!showPassword ? (
                 <Eye
-                  className="absolute top-1/2 right-3"
+                  className="absolute top-1/2 right-3 cursor-pointer"
                   size={20}
                   onClick={() => setShowPassword((prev) => !prev)}
                 />
               ) : (
                 <EyeOff
-                  className="absolute top-1/2 right-3"
+                  className="absolute top-1/2 right-3 cursor-pointer"
                   size={20}
                   onClick={() => setShowPassword((prev) => !prev)}
                 />
@@ -152,13 +154,13 @@ export const Signup = () => {
               />
               {!showConfirmPassword ? (
                 <Eye
-                  className="absolute top-1/2 right-3"
+                  className="absolute top-1/2 right-3 cursor-pointer"
                   size={20}
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                 />
               ) : (
                 <EyeOff
-                  className="absolute top-1/2 right-3"
+                  className="absolute top-1/2 right-3 cursor-pointer"
                   size={20}
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                 />
